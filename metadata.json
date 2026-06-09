@@ -1,0 +1,6 @@
+{
+  "name": "DH PayFlow",
+  "description": "A modern, secure fintech digital payments wallet app with instant P2P payments, QR code transactions, multi-currency support, analytics, bank transfers, and fraud screening.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

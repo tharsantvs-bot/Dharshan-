@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- High-tech backdrop logo framing -->
+    <path
+        android:pathData="M54,16 L88,34 L88,74 L54,92 L20,74 L20,34 Z"
+        android:fillColor="#150044" />
+
+    <path
+        android:pathData="M54,18 L86,35 L86,73 L54,90 L22,73 L22,35 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="22"
+                android:startY="18"
+                android:endX="86"
+                android:endY="90"
+                android:type="linear">
+                <item android:offset="0" android:color="#001F3D" />
+                <item android:offset="1" android:color="#04325A" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Outer glowing neon border lines -->
+    <path
+        android:pathData="M54,18 L86,35 L86,73 L54,90 L22,73 L22,35 Z"
+        android:strokeWidth="2.5"
+        android:strokeLineJoin="round"
+        android:strokeLineCap="round">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:startX="22"
+                android:startY="18"
+                android:endX="86"
+                android:endY="90"
+                android:type="linear">
+                <item android:offset="0" android:color="#00E5FF" />
+                <item android:offset="0.5" android:color="#2196F3" />
+                <item android:offset="1" android:color="#00FF87" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Premium Geometric "D" Monoxen Letter with EvenOdd Center Cutout -->
+    <path
+         android:pathData="M30,36 H46 c10,0 18,8 18,18 v0 c0,10 -8,18 -18,18 H30 Z M38,44 v18 h8 c5,0 10,-4 10,-10 v0 c0,-6 -5,-8 -10,-8 Z"
+         android:fillType="evenOdd">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="30"
+                android:startY="36"
+                android:endX="64"
+                android:endY="72"
+                android:type="linear">
+                <item android:offset="0" android:color="#00E5FF" />
+                <item android:offset="1" android:color="#0088FF" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Premium Geometric "H" Monoxen Letter consisting of solid rods -->
+    <!-- Left Stem -->
+    <path
+        android:pathData="M66,36 h7 a1,1 0 0,1 1,1 v34 a1,1 0 0,1 -1,1 h-7 a1,1 0 0,1 -1,-1 v-34 a1,1 0 0,1 1,-1 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="65"
+                android:startY="36"
+                android:endX="74"
+                android:endY="72"
+                android:type="linear">
+                <item android:offset="0" android:color="#00FF87" />
+                <item android:offset="1" android:color="#60EFA0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Right Stem -->
+    <path
+        android:pathData="M81,36 h7 a1,1 0 0,1 1,1 v34 a1,1 0 0,1 -1,1 h-7 a1,1 0 0,1 -1,-1 v-34 a1,1 0 0,1 1,-1 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="80"
+                android:startY="36"
+                android:endX="89"
+                android:endY="72"
+                android:type="linear">
+                <item android:offset="0" android:color="#00FF87" />
+                <item android:offset="1" android:color="#60EFA0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Crossbar -->
+    <path
+        android:pathData="M73,51 h9 v6 h-9 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="73"
+                android:startY="51"
+                android:endX="82"
+                android:endY="57"
+                android:type="linear">
+                <item android:offset="0" android:color="#00E5FF" />
+                <item android:offset="1" android:color="#00FF87" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Decorative bottom micro-node for high tech dynamic feel -->
+    <path
+        android:pathData="M54,78.5 A2.5,2.5 0 1 1 51.5,76 A2.5,2.5 0 0 1 54,78.5 Z"
+        android:fillColor="#00FF87" />
+
+</vector>
