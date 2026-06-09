@@ -1156,6 +1156,224 @@ fun DashboardScreen(
             val darkTheme = isSystemInDarkTheme()
             val borderColor = if (darkTheme) BentoDarkBorder else BentoBorder
             val containerColor = if (darkTheme) BentoDarkSurface else Color.White
+            val accentColor = if (darkTheme) BentoDarkPrimary else BentoPrimary
+            val context = LocalContext.current
+            val scope = rememberCoroutineScope()
+            val userPhone = activeUser?.phone ?: "+94 77 123 4567"
+
+            val gradientColors = if (darkTheme) {
+                listOf(Color(0xFF0F2027), Color(0xFF203A43))
+            } else {
+                listOf(Color(0xFFE8F4FD), Color(0xFFD4E6F1))
+            }
+
+            Card(
+                colors = CardDefaults.cardColors(containerColor = containerColor),
+                shape = RoundedCornerShape(24.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(
+                        width = 1.5.dp, 
+                        color = if (darkTheme) accentColor.copy(alpha = 0.4f) else accentColor.copy(alpha = 0.2f), 
+                        shape = RoundedCornerShape(24.dp)
+                    )
+                    .clip(RoundedCornerShape(24.dp))
+                    .testTag("unique_wallet_recharge_card")
+            ) {
+                Column(
+                    modifier = Modifier
+                        .background(
+                            brush = Brush.verticalGradient(colors = gradientColors)
+                        )
+                        .padding(18.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.VpnKey,
+                                contentDescription = "Key",
+                                tint = accentColor,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Text(
+                                text = "Unique eZ Wallet Account",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (darkTheme) Color.White else BentoOnBackground
+                            )
+                        }
+                        Box(
+                            modifier = Modifier
+                                .background(accentColor.copy(alpha = 0.15f), RoundedCornerShape(20.dp))
+                                .padding(horizontal = 8.dp, vertical = 2.dp)
+                        ) {
+                            Text(
+                                "Auto-Deposit Enabled",
+                                color = accentColor,
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Black
+                            )
+                        }
+                    }
+
+                    Text(
+                        text = "Your unique registered app number is linked directly to your digital multi-currency vault. Send a reload to this number to automatically credit your wallet instantly!",
+                        fontSize = 11.sp,
+                        color = if (darkTheme) BentoDarkMutedText else BentoMutedText
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = if (darkTheme) Color.White.copy(0.06f) else Color.White.copy(0.6f),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            .border(1.dp, borderColor, RoundedCornerShape(12.dp))
+                            .padding(horizontal = 14.dp, vertical = 10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Smartphone,
+                                contentDescription = "Phone",
+                                tint = accentColor
+                            )
+                            Column {
+                                Text(
+                                    text = userPhone,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    fontFamily = FontFamily.Monospace,
+                                    color = if (darkTheme) Color.White else BentoOnBackground
+                                )
+                                Text(
+                                    text = "DH Network Gateway Key",
+                                    fontSize = 9.sp,
+                                    color = if (darkTheme) BentoDarkMutedText else BentoMutedText
+                                )
+                            }
+                        }
+
+                        IconButton(
+                            onClick = {
+                                val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                                val clip = android.content.ClipData.newPlainText("eZ Wallet Number", userPhone)
+                                clipboard.setPrimaryClip(clip)
+                                Toast.makeText(context, "Wallet number copied!", Toast.LENGTH_SHORT).show()
+                            },
+                            modifier = Modifier.size(32.dp).testTag("copy_wallet_number_btn")
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ContentCopy,
+                                contentDescription = "Copy Wallet Number",
+                                tint = accentColor,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
+
+                    // Dynamic Instant Quick-Load Slider Panel
+                    var quickLoadAmountLkr by remember { mutableStateOf(500.0) } // Standard Ceylon Cash values
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Instant Top-Up Reload Slider:",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (darkTheme) Color.White else BentoOnBackground
+                        )
+                        Text(
+                            text = "Rs. ${String.format("%.0f", quickLoadAmountLkr)} (~ $${String.format("%.2f", quickLoadAmountLkr / 300.0)} USD)",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Black,
+                            color = accentColor
+                        )
+                    }
+
+                    Slider(
+                        value = quickLoadAmountLkr.toFloat(),
+                        onValueChange = { quickLoadAmountLkr = it.toDouble() },
+                        valueRange = 100f..5000f,
+                        steps = 49,
+                        colors = SliderDefaults.colors(
+                            thumbColor = accentColor,
+                            activeTrackColor = accentColor,
+                            inactiveTrackColor = borderColor
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(24.dp)
+                    )
+
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                val amountUsd = quickLoadAmountLkr / 300.0
+                                val (success, msg) = vm.executeQuickRecharge(
+                                    phoneNumber = userPhone,
+                                    amountLKR = quickLoadAmountLkr,
+                                    usdDebit = amountUsd
+                                )
+                                if (success) {
+                                    Toast.makeText(context, "Instant FREE load auto-deposited! Balance updated.", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Toast.makeText(context, "Error: $msg", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = accentColor
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(38.dp)
+                            .testTag("simulate_gateway_deposit_btn"),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Bolt,
+                            contentDescription = "Bolt",
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "Simulate Instant Free Deposit Reload",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp
+                        )
+                    }
+
+                    Text(
+                        text = "ℹ️ Standard mobile reloads (Ceylon Dialog TV, Mobitel, Hutch, SLT-Mobitel) targeting your registered number $userPhone are automatically captured and auto-deposited directly to your primary balance.",
+                        fontSize = 9.sp,
+                        color = if (darkTheme) BentoDarkMutedText else BentoMutedText,
+                        lineHeight = 11.sp
+                    )
+                }
+            }
+        }
+
+        item {
+            val darkTheme = isSystemInDarkTheme()
+            val borderColor = if (darkTheme) BentoDarkBorder else BentoBorder
+            val containerColor = if (darkTheme) BentoDarkSurface else Color.White
 
             Card(
                 colors = CardDefaults.cardColors(containerColor = containerColor),
@@ -3681,6 +3899,47 @@ fun MobileRechargeScreen(vm: PayFlowViewModel, onBack: () -> Unit) {
                     .fillMaxWidth()
                     .testTag("recharge_phone_input")
             )
+
+            val activeUserVal by vm.currentUserState.collectAsState()
+            if (!isDthMode && activeUserVal != null) {
+                val registeredPhone = activeUserVal?.phone ?: ""
+                val stripDialCode = vm.rechargeDialCode.replace("+", "").trim()
+                val displayQuickNumber = registeredPhone
+                    .replace(vm.rechargeDialCode, "")
+                    .replace("+$stripDialCode", "")
+                    .replace(Regex("[^0-9]"), "")
+                    .trim()
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "My Wallet Phone Number: ${activeUserVal?.phone}",
+                        fontSize = 11.sp,
+                        color = mutedCol,
+                        fontWeight = FontWeight.Bold
+                    )
+                    
+                    Text(
+                        text = "⚡ PREFILL WALLET",
+                        fontSize = 11.sp,
+                        color = accentColor,
+                        fontWeight = FontWeight.Black,
+                        modifier = Modifier
+                            .clickable {
+                                vm.rechargePhone = displayQuickNumber
+                                vm.rechargeCarrier = "Dialog"
+                                vm.rechargeCountry = "Sri Lanka"
+                            }
+                            .padding(4.dp)
+                            .testTag("prefill_self_wallet_number")
+                    )
+                }
+            }
 
             // Form: Carrier Network Operator
             Text(

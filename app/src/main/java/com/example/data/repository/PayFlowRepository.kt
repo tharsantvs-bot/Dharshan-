@@ -506,26 +506,37 @@ class PayFlowRepository(private val dao: PayFlowDao) {
         val wallet = dao.getWalletByUserId(userId) ?: return Pair(false, "Wallet not found")
         val user = dao.getUserById(userId) ?: return Pair(false, "Profile error")
 
-        if (wallet.balanceUSD < usdDebitAmount) {
-            return Pair(false, "Insufficient balance: need $${String.format("%.2f", usdDebitAmount)} USD equivalent")
-        }
+        val cleanTarget = phoneNumber.replace(Regex("[^0-9]"), "")
+        val cleanUserPhone = user.phone.replace(Regex("[^0-9]"), "")
+        
+        // Match numbers: if they end-match or equal, detect as dynamic direct auto-deposit
+        val isSelfReload = cleanTarget.isNotEmpty() && cleanUserPhone.isNotEmpty() && 
+                (cleanTarget.endsWith(cleanUserPhone) || cleanUserPhone.endsWith(cleanTarget) || cleanTarget == cleanUserPhone)
 
-        // Deduct from primary reserve USD
-        val updatedWallet = wallet.copy(balanceUSD = wallet.balanceUSD - usdDebitAmount)
+        val updatedWallet = if (isSelfReload) {
+            wallet.copy(balanceUSD = wallet.balanceUSD + usdDebitAmount)
+        } else {
+            if (wallet.balanceUSD < usdDebitAmount) {
+                return Pair(false, "Insufficient balance: need $${String.format("%.2f", usdDebitAmount)} USD equivalent")
+            }
+            wallet.copy(balanceUSD = wallet.balanceUSD - usdDebitAmount)
+        }
+        
         dao.updateWallet(updatedWallet)
 
         // Store log
         dao.insertTransaction(
             Transaction(
-                senderId = userId,
-                senderName = user.name,
-                receiverId = -1L,
-                receiverName = "$carrier ($phoneNumber)",
+                senderId = if (isSelfReload) -1L else userId,
+                senderName = if (isSelfReload) "eZ Gateway Auto-Reload" else user.name,
+                receiverId = if (isSelfReload) userId else -1L,
+                receiverName = if (isSelfReload) "Unique App Wallet" else "$carrier ($phoneNumber)",
                 amount = discountedAmount,
                 currency = currency,
-                type = "WITHDRAW",
+                type = if (isSelfReload) "ADD" else "WITHDRAW",
                 status = "SUCCESS",
-                note = "Mobile Recharge ($originalAmount $currency value, Coupon $couponApplied applied)"
+                note = if (isSelfReload) "Direct auto-deposit of $currency $originalAmount ($usdDebitAmount USD equiv) to unique wallet card via eZ Cash Gateway." 
+                       else "Mobile Recharge ($originalAmount $currency value, Coupon $couponApplied applied)"
             )
         )
 
@@ -533,8 +544,9 @@ class PayFlowRepository(private val dao: PayFlowDao) {
         dao.insertNotification(
             Notification(
                 userId = userId,
-                title = "Mobile Recharge Success",
-                message = "Successfully recharged $phoneNumber ($carrier) with $currency ${String.format("%.2f", originalAmount)}. Charged $currency ${String.format("%.2f", discountedAmount)} (Promo $couponApplied applied)."
+                title = if (isSelfReload) "Auto-Deposit Wallet Reload Completed!" else "Mobile Recharge Success",
+                message = if (isSelfReload) "Automatically credited $currency ${String.format("%.2f", originalAmount)} directly to your unique wallet. Transferred from reload gateway."
+                          else "Successfully recharged $phoneNumber ($carrier) with $currency ${String.format("%.2f", originalAmount)}. Charged $currency ${String.format("%.2f", discountedAmount)} (Promo $couponApplied applied)."
             )
         )
 
@@ -542,11 +554,12 @@ class PayFlowRepository(private val dao: PayFlowDao) {
             SecurityLog(
                 userId = userId,
                 actionType = "TRANSACTION",
-                description = "Recharged mobile phone $phoneNumber via $carrier. Amount: $currency $originalAmount (Paid: $discountedAmount / USD $usdDebitAmount equivalent)"
+                description = if (isSelfReload) "Wallet auto-reloaded by target match on unique phone number $phoneNumber. Amount credited: USD $usdDebitAmount equiv"
+                              else "Recharged mobile phone $phoneNumber via $carrier. Amount: $currency $originalAmount (Paid: $discountedAmount / USD $usdDebitAmount equivalent)"
             )
         )
 
-        return Pair(true, "Recharged successfully!")
+        return Pair(true, if (isSelfReload) "Auto-deposit wallet reload processed! +$currency $originalAmount applied." else "Recharged successfully!")
     }
 
     suspend fun executeSuperServicePayment(

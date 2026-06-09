@@ -453,6 +453,24 @@ class PayFlowViewModel(application: Application) : AndroidViewModel(application)
         return repository.executeMerchantDeposit(id, amountLKR, "LKR", usdCredit, payerName)
     }
 
+    suspend fun executeQuickRecharge(
+        phoneNumber: String,
+        amountLKR: Double,
+        usdDebit: Double
+    ): Pair<Boolean, String> {
+        val uId = _currentUserId.value ?: return Pair(false, "No user context")
+        return repository.executeMobileRecharge(
+            userId = uId,
+            phoneNumber = phoneNumber,
+            carrier = "DH Gateway Load",
+            originalAmount = amountLKR,
+            discountedAmount = amountLKR,
+            currency = "LKR",
+            usdDebitAmount = usdDebit,
+            couponApplied = "DH_AUTO_LOAD_PROMO"
+        )
+    }
+
     fun performMobileRecharge() {
         val uId = _currentUserId.value ?: return
         val phone = rechargePhone.trim()
